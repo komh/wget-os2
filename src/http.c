@@ -2335,6 +2335,21 @@ check_file_output (const struct url *u, struct http_stat *hs,
       xfree (local_file);
     }
 
+#ifdef __OS2__
+    {
+      /* Convert '?' which is an invalid character on OS/2 to a percent
+       * encoding. */
+      char *p = strchr (hs->local_file, '?');
+      if (p)
+        {
+          char *tmp = aprintf ("%.*s%%3F%s",
+                               p - hs->local_file, hs->local_file, p + 1);
+          xfree (hs->local_file);
+          hs->local_file = tmp;
+        }
+    }
+#endif
+
   hs->temporary = opt.delete_after || opt.spider || !acceptable (hs->local_file);
   if (hs->temporary)
     {
